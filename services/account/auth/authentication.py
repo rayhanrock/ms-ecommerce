@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from .hashing import verify_password
 from users.models import User
 from users.crud import get_user_by_email, get_user
+from users.schemas import User as UserSchema
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -51,5 +52,5 @@ def verify_access_token(token: str, db: Session):
     if user is None:
         raise credentials_exception
 
-    data = {'id': user.id, 'is_active': user.is_active, 'role': user.role}
+    data = UserSchema(id=user.id, is_active=user.is_active, role=user.role, email=user.email)
     return data

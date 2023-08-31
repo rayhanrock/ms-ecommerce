@@ -1,13 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Header, Request
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 
-from . import schemas
+from . import schemas, dependency
+from users.schemas import User
 from database import get_db
 from .authentication import Token, authenticate_user, verify_access_token
 
-router = APIRouter( tags=["Authentication"] )
+router = APIRouter(tags=["Authentication"])
 
 
 @router.post("/token")
@@ -19,13 +20,6 @@ async def login_for_access_token(loginData: schemas.UserLogin, db: Session = Dep
     return {"access_token": token, "token_type": "bearer"}
 
 
-@router.post("/verify-token/")
-def get_user_by_token(authorization: Annotated[str | None, Header(...)] = None, db: Session = Depends(get_db)):
-    print(authorization)
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid token format")
-    token = authorization.split("Bearer ")[1]
-
-    user = verify_access_token(token, db)
-
+@router.get("/verify-token/")
+def get_user_by_token(user: User = Depends(dependency.get_user_by_token)):
     return user
