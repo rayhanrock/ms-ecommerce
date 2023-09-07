@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class InventoryBase(BaseModel):
@@ -6,13 +7,14 @@ class InventoryBase(BaseModel):
 
 
 class InventoryCreate(InventoryBase):
-    pass
+    product_id: int
 
 
 class Inventory(InventoryBase):
     id: int
     product_id: int
-    product: "Product"  # Relationship field
+    created_at: datetime
+    updated_at: datetime | None
 
     class Config:
         orm_mode = True

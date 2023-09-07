@@ -1,8 +1,11 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from database import get_db, Base, engine
 from sqlalchemy.orm import Session
 from . import crud, schemas
 from .permissions import is_admin
+from .dependency import ProductQueryParams
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,34 +28,27 @@ def read_category(id: int, db: Session = Depends(get_db)):
     return crud.get_category(db, id)
 
 
-@router.delete("/categories/{id}")
+@router.delete("/categories/{id}", dependencies=[Depends(is_admin)])
 def delete_category(id: int, db: Session = Depends(get_db)):
     crud.delete_category(db, id)
     return {"message": "Category deleted"}
 
 
-@router.patch("/categories/{id}")
+@router.patch("/categories/{id}", dependencies=[Depends(is_admin)])
 def update_category(id: int, category: schemas.CategoryCreate, db: Session = Depends(get_db)):
     return crud.update_category(db, id, category)
 
 
 # route for products
-@router.post("/products/", response_model=schemas.ProductCreate)
+@router.post("/products/", response_model=schemas.ProductCreate, dependencies=[Depends(is_admin)])
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
     crud.get_category(db, id=product.category_id)
     return crud.create_product(db=db, product=product)
 
 
 @router.get("/products/", response_model=list[schemas.Product])
-def read_products(skip: int = 0, limit: int = 100, category_id: int = None, db: Session = Depends(get_db)):
-    if category_id is not None:
-        # Filter products by category
-        products = crud.filter_products_by_category(db, category_id, skip, limit)
-    else:
-        # Retrieve all products when no category_id is provided
-        products = crud.get_all_products(db, skip, limit)
-
-    return products
+def read_products(params: Annotated[ProductQueryParams, Depends()], db: Session = Depends(get_db)):
+    return crud.get_products(db, params)
 
 
 @router.get("/products/{id}", response_model=schemas.Product)
@@ -60,12 +56,12 @@ def read_product(id: int, db: Session = Depends(get_db)):
     return crud.get_product(db, id)
 
 
-@router.patch("/products/{id}")
+@router.patch("/products/{id}", dependencies=[Depends(is_admin)])
 def update_product(id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
     return crud.update_product(db, id, product)
 
 
-@router.delete("/products/{id}")
+@router.delete("/products/{id}", dependencies=[Depends(is_admin)])
 def delete_product(id: int, db: Session = Depends(get_db)):
     crud.delete_product(db, id)
     return {"message": "Product deleted"}
