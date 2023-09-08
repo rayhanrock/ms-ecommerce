@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  cart-service:
+    build:
+      context: .
+    ports:
+      - "8003:80"
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - cart-postgres
+    networks:
+      - default
+      - gnetwork
+
+  cart-postgres:
+    container_name: cart_postgresql_db
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - default
+    volumes:
+      - ../../databases/shopping_cart-app/postgresql/data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: cart_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5051:80"
+    depends_on:
+      - cart-postgres
+    networks:
+      - default
+
+networks:
+  gnetwork:
+    name: gnetwork

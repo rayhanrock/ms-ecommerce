@@ -2,7 +2,8 @@ import subprocess
 
 compose_files = [
     "./services/account/docker-compose.yml",
-    "./services/product/docker-compose.yml"
+    "./services/product/docker-compose.yml",
+    "./services/cart/docker-compose.yml"
     # Add more compose file paths as needed
 ]
 
