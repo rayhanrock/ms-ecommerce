@@ -12,7 +12,7 @@ class Cart(Base):
     total_price = Column(Float, default=0.0)
 
     # Define a one-to-many relationship with CartItem
-    cart_items = relationship("CartItem", back_populates="cart")
+    cart_items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
 
 
 class CartItem(Base):

@@ -46,5 +46,8 @@ services:
       - default
 
 networks:
+  default:
+    driver: bridge
   gnetwork:
     name: gnetwork
+    external: true

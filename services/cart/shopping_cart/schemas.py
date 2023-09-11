@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from enum import Enum
 
 
 class AddToCart(BaseModel):
@@ -8,6 +9,17 @@ class AddToCart(BaseModel):
 
 class RemoveFromCart(BaseModel):
     product_id: int
+
+
+class OperationEnum(str, Enum):
+    increase = "increase"
+    decrease = "decrease"
+
+
+class UpdateCart(BaseModel):
+    product_id: int
+    operation: OperationEnum
+    quantity: int
 
 
 class CartItem(BaseModel):
