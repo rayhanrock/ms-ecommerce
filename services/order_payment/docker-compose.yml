@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  order-service:
+    build:
+      context: .
+    ports:
+      - "8004:80"
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - order-postgres
+    networks:
+      - default
+      - gnetwork
+
+  order-postgres:
+    container_name: order_postgresql_db
+    image: postgres
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - default
+    volumes:
+      - ../../databases/order-app/postgresql/data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: order_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5052:80"
+    depends_on:
+      - order-postgres
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+  gnetwork:
+    name: gnetwork
+    external: true

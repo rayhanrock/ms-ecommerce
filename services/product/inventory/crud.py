@@ -28,7 +28,7 @@ def create_inventory(db: Session, inventory: schemas.InventoryCreate):
 def check_stock(db: Session, product_id: int):
     product_in_inventory = db.query(models.Inventory).filter(models.Inventory.product_id == product_id).first()
     if not product_in_inventory:
-        raise HTTPException(status_code=404, detail="Product not found in inventory")
+        raise HTTPException(status_code=404, detail=f"Product id : {product_id} not found in inventory")
     return product_in_inventory
 
 
