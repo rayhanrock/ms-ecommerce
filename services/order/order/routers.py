@@ -23,11 +23,11 @@ async def create_order(order: schemas.PlaceOrder, db: Session = Depends(get_db),
     return crud.create_order(db=db, order=order, current_user=current_user)
 
 
-@router.post("/get-order/{order_id}", response_model=schemas.Order)
+@router.get("/get-order/{order_id}", response_model=schemas.Order)
 async def get_order(order_id: int, db: Session = Depends(get_db)):
     return crud.get_order(db=db, order_id=order_id)
 
 
-@router.post("/get-user-orders/", response_model=list[schemas.Order])
+@router.get("/get-user-orders/", response_model=list[schemas.Order])
 async def get_order(current_user=Depends(get_user), db: Session = Depends(get_db)):
     return crud.get_user_orders(db=db, current_user=current_user)

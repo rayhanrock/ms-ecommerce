@@ -19,6 +19,8 @@ class PlaceOrder(BaseModel):
 
 class OrderItem(BaseModel):
     product_id: int
+    product_price: float
+    product_name: str
     quantity: int
     subtotal: float
 

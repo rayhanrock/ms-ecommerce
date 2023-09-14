@@ -22,6 +22,8 @@ def create_order_by_cart(db: Session, cart: dict):
     for item in cart.get('cart_items'):
         order_item = models.OrderItem(
             product_id=item.get('product_id'),
+            product_price=item.get('product_price'),
+            product_name=item.get('product_name'),
             quantity=item.get('quantity'),
             subtotal=item.get('subtotal')
         )
@@ -50,6 +52,8 @@ def create_order(db: Session, order: schemas.PlaceOrder, current_user: dict):
         product = get_product(item.product_id)
         order_item = models.OrderItem(
             product_id=item.product_id,
+            product_price=product.get("price"),
+            product_name=product.get("name"),
             quantity=item.quantity,
             subtotal=item.quantity * product.get("price")
         )

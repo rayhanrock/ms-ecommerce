@@ -16,6 +16,8 @@ def add_to_cart(db: Session, cart: schemas.AddToCart, current_user: dict):
     sub_total = product.get("price") * cart.quantity
     cart_item = models.CartItem(
         product_id=product.get("id"),
+        product_price=product.get("price"),
+        product_name=product.get("name"),
         quantity=cart.quantity,
         subtotal=sub_total
     )

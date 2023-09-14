@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Float
+from sqlalchemy import Column, Integer, ForeignKey, Float, String
 from sqlalchemy.orm import relationship
 from enum import Enum
 from sqlalchemy.types import Enum as SQLAlchemyEnum
@@ -29,6 +29,8 @@ class OrderItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey('orders.id'))
     product_id = Column(Integer)
+    product_price = Column(Float)
+    product_name = Column(String)
     quantity = Column(Integer)
     subtotal = Column(Float, default=0.0)
 

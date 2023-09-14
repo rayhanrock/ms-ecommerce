@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  payment-service:
+    build:
+      context: .
+    ports:
+      - "8005:80"
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - payment-postgres
+    networks:
+      - default
+      - gnetwork
+
+  payment-postgres:
+    container_name: payment_postgresql_db
+    image: postgres
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - default
+    volumes:
+      - ../../databases/payment-app/postgresql/data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: payment_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5053:80"
+    depends_on:
+      - payment-postgres
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+  gnetwork:
+    name: gnetwork
+    external: true

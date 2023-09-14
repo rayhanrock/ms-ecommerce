@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Float
+from sqlalchemy import Column, Integer, ForeignKey, Float, String
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -21,6 +21,8 @@ class CartItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     cart_id = Column(Integer, ForeignKey('carts.id'))
     product_id = Column(Integer)
+    product_name = Column(String)
+    product_price = Column(Float)
     quantity = Column(Integer)
     subtotal = Column(Float, default=0.0)
 
