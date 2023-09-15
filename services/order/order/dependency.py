@@ -5,9 +5,9 @@ from typing import Annotated
 
 from os import  environ as env
 
-ACCOUNT_SERVICE_URL = "http://account-service:80"
-CART_SERVICE_URL = "http://cart-service:80"
-PRODUCT_SERVICE_URL = "http://product-service:80"
+ACCOUNT_SERVICE_URL = env.get("ACCOUNT_SERVICE_URL")
+CART_SERVICE_URL = env.get("CART_SERVICE_URL")
+PRODUCT_SERVICE_URL = env.get("PRODUCT_SERVICE_URL")
 
 
 def get_user_cart(authorization: Annotated[str | None, Header(...)] = None):
