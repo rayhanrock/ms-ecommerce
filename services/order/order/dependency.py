@@ -3,6 +3,12 @@ import requests
 
 from typing import Annotated
 
+from os import  environ as env
+
+ACCOUNT_SERVICE_URL = "http://account-service:80"
+CART_SERVICE_URL = "http://cart-service:80"
+PRODUCT_SERVICE_URL = "http://product-service:80"
+
 
 def get_user_cart(authorization: Annotated[str | None, Header(...)] = None):
     if not authorization or not authorization.startswith("Bearer "):
@@ -11,7 +17,7 @@ def get_user_cart(authorization: Annotated[str | None, Header(...)] = None):
     token = authorization.split("Bearer ")[1]
     try:
         response = requests.get(
-            f"http://cart-service:80/get-cart/",
+            f"{CART_SERVICE_URL}/get-cart/",
             headers={"Authorization": f"Bearer {token}"}
         )
         if response.status_code == 200:
@@ -31,7 +37,7 @@ def get_user(authorization: Annotated[str | None, Header(...)] = None):
     token = authorization.split("Bearer ")[1]
     try:
         response = requests.get(
-            f"http://account-service:80/verify-token/",
+            f"{ACCOUNT_SERVICE_URL}/verify-token/",
             headers={"Authorization": f"Bearer {token}"}
         )
         if response.status_code == 200:
@@ -46,7 +52,7 @@ def get_user(authorization: Annotated[str | None, Header(...)] = None):
 
 def get_product(product_id: int):
     try:
-        response = requests.get(f"http://product-service:80/products/{product_id}")
+        response = requests.get(f"{PRODUCT_SERVICE_URL}/products/{product_id}")
         if response.status_code == 200:
             return response.json()
         response.raise_for_status()  # Raise an exception for non-2xx status codes
@@ -60,7 +66,7 @@ def get_product(product_id: int):
 
 def get_product_stock(product_id: int):
     try:
-        response = requests.get(f"http://product-service:80/check-stock/{product_id}")
+        response = requests.get(f"{PRODUCT_SERVICE_URL}/products/check-stock/{product_id}")
         if response.status_code == 200:
             return response.json()
         response.raise_for_status()  # Raise an exception for non-2xx status codes

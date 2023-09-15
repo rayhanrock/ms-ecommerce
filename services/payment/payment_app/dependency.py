@@ -3,6 +3,11 @@ import requests
 
 from typing import Annotated
 
+from os import environ as env
+
+ACCOUNT_SERVICE_HOST = env.get('ACCOUNT_SERVICE_HOST')
+ORDER_SERVICE_HOST = env.get('ORDER_SERVICE_HOST')
+
 
 def get_user(authorization: Annotated[str | None, Header(...)] = None):
     if not authorization or not authorization.startswith("Bearer "):
@@ -11,7 +16,7 @@ def get_user(authorization: Annotated[str | None, Header(...)] = None):
     token = authorization.split("Bearer ")[1]
     try:
         response = requests.get(
-            f"http://account-service:80/verify-token/",
+            f"{ACCOUNT_SERVICE_HOST}/verify-token/",
             headers={"Authorization": f"Bearer {token}"}
         )
         if response.status_code == 200:
@@ -26,7 +31,7 @@ def get_user(authorization: Annotated[str | None, Header(...)] = None):
 
 def get_order(order_id: int):
     try:
-        response = requests.get(f"http://order-service:80/get-order/{order_id}")
+        response = requests.get(f"{ORDER_SERVICE_HOST}/get-order/{order_id}")
         if response.status_code == 200:
             return response.json()
         response.raise_for_status()  # Raise an exception for non-2xx status codes

@@ -4,7 +4,7 @@ from . import schemas
 from .dependency import get_order
 from . import models
 
-from .paypal_api import create_paypal_order
+from .paypal_api import create_paypal_order, capture_payment
 
 
 def make_payment(db: Session, user: dict, order_id: int):
@@ -46,3 +46,24 @@ def make_payment(db: Session, user: dict, order_id: int):
     )
 
     return payment_info
+
+
+def auto_capture_payment_after_approval(db: Session, token: str, PayerID: str = None):
+    payload = capture_payment(token)
+    print(payload)
+    if payload.get('status') == 'COMPLETED':
+        get_db_payment = db.query(models.Payment).filter(models.Payment.paypal_order_id == payload.get('id')).first()
+        get_db_payment.status = models.PaymentStatus.COMPLETE
+
+        db.commit()
+        db.refresh(get_db_payment)
+
+        order = get_order(get_db_payment.order_id)
+
+        # payment completed!!
+        # do shipping (shipping service is not build yet)
+        # update the stock of the product in the inventory for the order items
+
+        return {"details": get_db_payment}
+
+    return {"message": "something went wrong"}

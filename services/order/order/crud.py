@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import schemas
-
+from decimal import Decimal
 from . import models
 from .dependency import get_product_stock, get_product
 
@@ -55,7 +55,7 @@ def create_order(db: Session, order: schemas.PlaceOrder, current_user: dict):
             product_price=product.get("price"),
             product_name=product.get("name"),
             quantity=item.quantity,
-            subtotal=item.quantity * product.get("price")
+            subtotal=Decimal(str(item.quantity)) * Decimal(str(product.get("price")))
         )
 
         db_order.order_items.append(order_item)

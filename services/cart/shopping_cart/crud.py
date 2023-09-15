@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import schemas
-
+from decimal import Decimal
 from .dependency import get_product
 from . import models
 
@@ -13,7 +13,7 @@ def add_to_cart(db: Session, cart: schemas.AddToCart, current_user: dict):
         if cart_item.product_id == cart.product_id:
             raise HTTPException(status_code=400, detail="Product already in cart")
 
-    sub_total = product.get("price") * cart.quantity
+    sub_total = Decimal(str(product.get("price"))) * Decimal(str(cart.quantity))
     cart_item = models.CartItem(
         product_id=product.get("id"),
         product_price=product.get("price"),

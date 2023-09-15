@@ -9,7 +9,7 @@ from database import Base
 class OrderStatus(Enum):
     PENDING = "pending"
     COMPLETE = "complete"
-    REFUND = "refund"
+ 
 
 
 class Order(Base):

@@ -2,12 +2,13 @@ import json
 
 import requests
 from fastapi import HTTPException
+from os import environ as env
 
 from payment_app import schemas
 
-BASE_URL = 'https://api-m.sandbox.paypal.com/'
-CLIENT_ID = 'AfMl4htw_-peHoh8cnisM0-3lVsdjlrVgP5XLe_EA85cMjDI8xNnX8uTfmoxxSqkhW6gZEH6pIwTh_Kf'
-CLIENT_SECRET = 'EBPhinf2XqG5IYF_gUPLTdkfxoYaPVfkwTumDEaqkX06PbMKXR9tKqxQ-d2N_A3ewC0xfOdYFTQXfKOS'
+BASE_URL = env.get('BASE_URL')
+CLIENT_ID = env.get('CLIENT_ID')
+CLIENT_SECRET = env.get('CLIENT_SECRET')
 
 
 def get_papal_access_token():
@@ -75,7 +76,7 @@ def create_paypal_order(order: schemas.OrderSchemaForPaypal):
                 "experience_context": {
                     "brand_name": "EXAMPLE INC",
                     "locale": "en-US",
-                    "return_url": "https://example.com/returnUrl",
+                    "return_url": "http://localhost:8005/auto-capture-payment-after-approval",
                     "cancel_url": "https://example.com/cancelUrl"
                 }
             }
@@ -83,15 +84,34 @@ def create_paypal_order(order: schemas.OrderSchemaForPaypal):
     }
     try:
         response = requests.post(f'{BASE_URL}v2/checkout/orders/', headers=headers, data=json.dumps(data))
-        print(response.status_code)
-        print(response.text)  # Print the response content for debugging
         if response.status_code == 200:
             return response.json()
         response.raise_for_status()  # Raise an exception for non-2xx status codes
     except requests.RequestException as e:
-        print(e)
-        # if e.response is not None:
-        #     raise HTTPException(status_code=e.response.status_code, detail=e.response.json())
+        if e.response is not None:
+            raise HTTPException(status_code=e.response.status_code, detail=e.response.json())
 
         # Handle connection errors and other issues
         raise HTTPException(status_code=500, detail=f"An error occurred while creating the paypal order")
+
+
+def capture_payment(paypal_order_id: str):
+    payload = get_papal_access_token()
+    token = payload.get('access_token')
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}',
+    }
+
+    try:
+        response = requests.post(f'{BASE_URL}v2/checkout/orders/{paypal_order_id}/capture', headers=headers)
+        print(response.text)
+        if response.status_code == 201:
+            return response.json()
+        response.raise_for_status()  # Raise an exception for non-2xx status codes
+    except requests.RequestException as e:
+        if e.response is not None:
+            raise HTTPException(status_code=e.response.status_code, detail=e.response.json())
+
+        raise HTTPException(status_code=500, detail=f"An error occurred while capturing the payment")

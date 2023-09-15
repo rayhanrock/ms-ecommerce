@@ -4,6 +4,10 @@ from fastapi import Query
 
 from typing import Annotated
 
+from os import environ as env
+
+ACCOUNT_SERVICE_URL = env.get("ACCOUNT_SERVICE_URL")
+
 
 def get_user_by_token(authorization: Annotated[str | None, Header(...)] = None):
     if not authorization or not authorization.startswith("Bearer "):
@@ -12,7 +16,7 @@ def get_user_by_token(authorization: Annotated[str | None, Header(...)] = None):
     token = authorization.split("Bearer ")[1]
     try:
         response = requests.get(
-            f"http://account-service:80/verify-token/",
+            f"{ACCOUNT_SERVICE_URL}/verify-token/",
             headers={"Authorization": f"Bearer {token}"}
         )
         response.raise_for_status()  # Raise an exception for non-2xx status codes
