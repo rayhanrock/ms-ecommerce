@@ -16,7 +16,7 @@ class Product(CreatedAtMixin, Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     category = relationship("Category", back_populates="products")
 
-    inventory = relationship("Inventory", back_populates="product", uselist=False)
+    inventory = relationship("Inventory", back_populates="product", uselist=False, cascade="all, delete-orphan")
 
 
 class Category(CreatedAtMixin, Base):

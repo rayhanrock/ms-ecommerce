@@ -1,6 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import schemas, models
+from .dependency import ProductQueryParams
+from .filters import ProductFilter
 
 
 # crud functions for categories
@@ -53,14 +55,19 @@ def get_product(db: Session, id: int):
     return product
 
 
-def get_all_products(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Product).offset(skip).limit(limit).all()
+def get_products(db: Session, params: ProductQueryParams):
+    # Initialize a query to retrieve products
+    queryset = db.query(models.Product)
 
+    # Create a ProductFilter instance with the params
+    product_filter = ProductFilter(params)
 
-def filter_products_by_category(db: Session, category_id: int, skip: int, limit: int):
-    category = get_category(db, category_id)
-    products = db.query(models.Product).filter(models.Product.category_id == category.id).offset(skip).limit(
-        limit).all()
+    # Apply filters and sorting using the ProductFilter instance
+    filtered_queryset = product_filter.apply_filters(queryset)
+    product_query = product_filter.apply_sort(filtered_queryset)
+
+    # Execute the query with skip and limit
+    products = product_query.offset(params.skip).limit(params.limit).all()
     return products
 
 
